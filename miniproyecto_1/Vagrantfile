@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  if Vagrant.has_plugin? "vagrant-vbguest"
+    config.vbguest.no_install  = true
+    config.vbguest.auto_update = false
+    config.vbguest.no_remote   = true
+  end
+# VM haproxy/cluster
+  config.vm.define :haproxycluster do |haproxycluster|
+    haproxycluster.vm.box = "bento/ubuntu-20.04"
+    haproxycluster.vm.network :private_network, ip: "192.168.100.11"
+    haproxycluster.vm.provision "file", source: "haproxy.cfg",destination:"/home/vagrant/haproxy.cfg"
+    haproxycluster.vm.provision "file", source: "config_server.json",destination:"/home/vagrant/config_server.json"
+    haproxycluster.vm.provision "file", source: "consul_server.service",destination:"/home/vagrant/consul_server.service"
+    haproxycluster.vm.provision "file", source: "503.http",destination:"/home/vagrant/503.http"
+    haproxycluster.vm.provision "file", source: "testscript.yml",destination:"/home/vagrant/testscript.yml"
+    haproxycluster.vm.provision "shell", path: "hc_script.sh" # Linea adicional para el aprovisionamiento
+    haproxycluster.vm.hostname = "haproxycluster"
+  end
+  #Web service 1
+  config.vm.define :web1 do |web1|
+    web1.vm.box = "bento/ubuntu-20.04"
+    web1.vm.network :private_network, ip: "192.168.100.21"
+    web1.vm.provision "file", source: "config_1.json",destination:"/home/vagrant/config_1.json"
+    web1.vm.provision "file", source: "consul_server.service",destination:"/home/vagrant/consul_server.service"
+    web1.vm.provision "file", source: "node_1.service",destination:"/home/vagrant/node_1.service"
+    web1.vm.provision "file", source: "index_1.js",destination:"/home/vagrant/index_1.js"
+    web1.vm.provision "shell", path: "web1_script.sh" # Linea adicional para el aprovisionamiento
+    web1.vm.hostname = "web1"
+  end
+  #Web service 2
+  config.vm.define :web2 do |web2|
+    web2.vm.box = "bento/ubuntu-20.04"
+    web2.vm.network :private_network, ip: "192.168.100.31"
+    web2.vm.provision "file", source: "config_1.json",destination:"/home/vagrant/config_1.json"
+    web2.vm.provision "file", source: "consul_server.service",destination:"/home/vagrant/consul_server.service"
+    web2.vm.provision "file", source: "node_2.service",destination:"/home/vagrant/node_2.service"
+    web2.vm.provision "file", source: "index_2.js",destination:"/home/vagrant/index_2.js"    
+    web2.vm.provision "shell", path: "web2_script.sh" # Linea adicional para el aprovisionamiento
+    web2.vm.hostname = "web2"
+  end
+
+end

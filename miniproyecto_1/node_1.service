@@ -1,0 +1,11 @@
+[Unit]
+Description=node Startup process
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'usr/bin/node /home/vagrant/consulService/app/index.js 3000'
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
