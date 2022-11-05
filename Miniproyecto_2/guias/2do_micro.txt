@@ -1,0 +1,118 @@
+//////////////// Punto #1: comandos crear cluster de kubernetes ///////////////
+
+PASO#1: Compruebo proveedores:
+
+az provider show -n Microsoft.OperationsManagement -o table
+az provider show -n Microsoft.OperationalInsights -o table
+
+*Si no estan los registro:
+
+az provider register --namespace Microsoft.OperationsManagement
+az provider register --namespace Microsoft.OperationalInsights
+
+PASO#2: Creo mi grupo de recursos 
+
+az group create --name compu_nube --location eastus
+
+PASO#3: Creo mi cluster , con node count 2 para tener dos agentes.
+
+az aks create -g compu_nube -n microproyecto_2 --enable-managed-identity --node-count 2 --enable-addons monitoring --generate-ssh-keys
+
+PASO#4: Conectarse al cluster y verificar los nodos que estan funcionando(AZURE CLI)
+
+az aks get-credentials --resource-group compu_nube --name microproyecto_2
+
+*verificar que nodos corren
+
+kubectl get nodes
+
+PASO#4 BIS CLOUD SHELL
+
+Import-AzAksCredential -ResourceGroupName compu_nube -Name microproyecto_2
+
+kubectl get nodes
+
+//////////////////// Punto#2: Aplicacion de clasificacion de imagenes en azure /////////////////////////
+Vamos a obtener la imagen realizada por el dueño del tutorial, entonces creamos en depleyment.yaml
+en una carpeta llamada punto_2
+
+aplicamos el .yaml
+
+kubectl apply -f deployment.yaml
+
+exponer el deployment
+
+kubectl expose deployment kubermatic-dl-deployment  --type=LoadBalancer --port 80 --target-port 5000
+
+Chekqueamos nuestro servicio
+kubectl get service
+
+meterme a un lugar donde este la imagen de prueba y correr, con la ip de nuestro servicio
+
+ curl -X POST -F img=@prueba_1.jpg http://40.76.148.188/predict
+
+
+////////////// Punto 3: Implementacion de una aplicacion //////////
+
+PASO#1: creo el .yaml obtenido en el tutorial
+vim azure-vote.yaml
+PASO#2: aplico mi .yaml
+kubectl apply -f azure-vote.yaml
+PASO#3: Comprobar el estado del front-end
+kubectl get service azure-vote-front --watch
+PASO#4: Ver la external ip y correrla en el localhost
+20.121.176.129  (en mi caso)
+
+
+//////////////// Punto 4: Supervision y monitoreo /////////////
+En esta ocasion utilizaremos el azure monitor para supervisar AKS
+
+Configuracion de la supervision
+
+
+------------------------------------------------------------------------
+
+# install docker
+sudo apt-get update
+
+sudo apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+
+sudo usermod -aG docker $USER
+
+# after this run an vagrant reload
+
+RES_GROUP=microproyecto-2
+RES_LOCATION=australiaeast
+ACR_NAME=zeroacrng
+CLUSTER_NAME=clusterCN
+
+# install azure cli
+
+sudo apt-get update
+sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg -y 
+
+curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+    gpg --dearmor |
+    sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
+AZ_REPO=$(lsb_release -cs)
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
+    sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+sudo apt-get update
+sudo apt-get install azure-cli
+
+

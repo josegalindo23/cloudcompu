@@ -1,0 +1,22 @@
+
+kubectl version = Verifique la versión del cluster
+
+kubectl cluster-info = Visualice detalles del cluster creado
+
+kubectl get nodes = Para mirar los nodos creados en el cluster 
+
+kubectl get pods --all-namespaces = Inspeccione los pods que estan corriendo
+
+kubectl create deployment hello-minikube 
+--image=gcr.io/google_containers/echoserver:1.4 
+--port=8080 = Ejecute la imagen hello-minikube
+
+Podemos ahora verificar los pods y deployments para verificar 
+que han sido actualizados ejecutando los siguientes comandos: kubectl get pods,
+kubectl get deployments
+
+kubectl expose deployment hello-minikube --type=NodePort = exponer 
+el deployment a la red externa vía el comando
+
+kubectl get services = Podemos verificar si el servicio fue expuesto 
+apropiadamente listando los servicios

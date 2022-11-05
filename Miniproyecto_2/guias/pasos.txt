@@ -1,0 +1,28 @@
+Realizando el punto 1 del micro proyecto 2
+
+az provider show -n Microsoft.OperationsManagement -o table
+az provider show -n Microsoft.OperationalInsights -o table
+
+az provider register --namespace Microsoft.OperationsManagement
+az provider register --namespace Microsoft.OperationalInsights
+
+az group create --name myResourceGroup --location eastus
+
+JSON que se crea
+{
+  "id": "/subscriptions/4f8e50ce-b098-4773-9db7-b02b340bfde3/resourceGroups/myResourceGroup",
+  "location": "eastus",
+  "managedBy": null,
+  "name": "myResourceGroup",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+
+az aks create -g myResourceGroup -n myAKSCluster 
+--enable-managed-identity --node-count 2 --enable-addons monitoring  
+--generate-ssh-keys
+
+Archivo JSON

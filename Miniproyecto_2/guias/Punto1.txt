@@ -1,0 +1,44 @@
+Comandos para crear Cluster, Nodos y comunicacion en AKS
+
+En el ejemplo siguiente, se crea un grupo de 
+recursos denominado myResourceGroup en la ubicación eastus.
+
+En este artículo se utiliza sintaxis de Bash para los comandos del 
+tutorial. Si usa Azure Cloud Shell, asegúrese de que la lista 
+desplegable de la parte superior izquierda de la ventana de Cloud 
+Shell está establecida en Bash.
+
+az group create --name myResourceGroup --location eastus
+
+Use el comando az aks create para crear un clúster de AKS denominado myAKSCluster. 
+Este comando creará los recursos de red necesarios en caso de que no existan.
+
+echo "Please enter the username to use as administrator 
+credentials for Windows Server nodes on your cluster: " && read WINDOWS_USERNAME
+
+az aks create \
+    --resource-group myResourceGroup \
+    --name myAKSCluster \
+    --node-count 2 \
+    --enable-addons monitoring \
+    --generate-ssh-keys \
+    --windows-admin-username $WINDOWS_USERNAME \
+    --vm-set-type VirtualMachineScaleSets \
+    --network-plugin azure
+
+crea un clúster con el valor de WINDOWS_USERNAME 
+establecido en el comando anterior
+
+Conectarse al clúster
+
+Para administrar un clúster de Kubernetes, usará kubectl, 
+el cliente de línea de comandos de Kubernetes. Si usa Azure 
+Cloud Shell, kubectl ya está instalado. Para instalar kubectl 
+localmente, use el comando az aks install-cli.
+
+Para configurar kubectl para conectarse a su clúster de Kubernetes, 
+use el comando az aks get-credentials. Con este comando se descargan 
+las credenciales y se configura la CLI de Kubernetes para usarlas.
+
+Para comprobar la conexión al clúster use:
+kubectl get nodes -o wide
